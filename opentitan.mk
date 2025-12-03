@@ -15,9 +15,9 @@ BENDER ?= ./bender
 VSIM ?= vsim
 DPI-LIB ?= work-dpi
 run_script := scripts/opentitan_start.tcl
-SRAM ?= ""
+SRAM ?= "sw/tests/opentitan/flash_preload_hmac_smoketest/flash_preload_hmac_smoketest.elf"
 BOOTMODE ?= 0
-QUESTA = questa-2022.3-bt
+QUESTA = 
 IDMA_ROOT ?= $(shell $(BENDER) path idma)
 
 # Ensure half-built targets are purged
@@ -53,10 +53,11 @@ endef
 .PHONY: init build sim update clean secure_boot_jtag secure_boot_spi
 
 build: scripts/compile_opentitan.tcl scripts/compile_opentitan_vip.tcl $(OT_ROOT)/hw/tb/vips
+	echo 'vlog "$ROOT/work-dpi/elfloader.cpp" -ccflags "-std=c++11"' > $(compile_script)
 	$(QUESTA) vsim -c -do 'source $(compile_script); quit'
 
 sim: build
-	$(QUESTA) vsim -do 'set SRAM $(SRAM); set BOOTMODE $(BOOTMODE); source $(run_script)'
+	$(QUESTA) vsim -c -do 'set SRAM $(SRAM); set BOOTMODE $(BOOTMODE); source $(run_script)'
 
 update:
 	bender update

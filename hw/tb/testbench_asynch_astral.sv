@@ -16,6 +16,7 @@ module testbench_asynch_astral ();
    import lc_ctrl_pkg::*;
    import jtag_ot_pkg::*;
    import jtag_ot_test::*;
+   import axi_test::*;
    import dm_ot::*;
    import tlul2axi_pkg::*;
    import top_earlgrey_pkg::*;
@@ -25,6 +26,7 @@ module testbench_asynch_astral ();
    import "DPI-C" context function byte read_section(input longint address, inout byte buffer[]);
 
  ////////////////////////////  Defines ////////////////////////////
+   localparam TEST="/work/amotta/RoT_NIC/sim/opentitan/flash_preload_hmac_smoketest/flash_preload_hmac_smoketest.elf";
 
    localparam AxiWideBeWidth    = 4;
    localparam AxiWideByteOffset = $clog2(AxiWideBeWidth);
@@ -446,10 +448,10 @@ module testbench_asynch_astral ();
        boot_mode=0;
        $display("BOOTMODE: %d", boot_mode);
     end
-    if(!$value$plusargs("SRAM=%s", sram)) begin
-       sram="";
-       $display("Loading to SRAM: %s", sram);
-    end
+    
+    sram=TEST;
+    $display("Loading to SRAM: %s", sram);
+    
 
     case(boot_mode)
         0:begin
@@ -528,6 +530,7 @@ module testbench_asynch_astral ();
          if (i%100 == 0)
            $display("[JTAG SECD] loading: %0d/100%%", i*100/secd_sections[addr]);
          riscv_dbg.write_dmi(dm_ot::SBData0, secd_memory[addr + i]);
+
          // Wait until SBA is free to write next 32 bits
          do riscv_dbg.read_dmi(dm_ot::SBCS, sbcs, dmi_wait_cycles);
          while (sbcs.sbbusy);

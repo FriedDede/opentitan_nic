@@ -80,38 +80,38 @@ module prim_otp_wrap_adv import prim_ram_1p_pkg::*; #(
   logic [TotalWidth-1:0]   rdata_sram ;
   logic [1:0]              rerror_q, rerror_d;
  
-`ifdef TARGET_XILINX
-  logic [7:0]                    wea;
-  logic [63:0]                   dina;
-  logic                          unused;
- 
-  assign wea  = 8'b00000000;
-  assign dina = 64'h00000000_00000000;
-  xilinx_rom_bank_1024x22 otp_mem_i (
-                                 .clk (clk_i),
-                                 .a   (addr_q),
-                                 .spo (rdata_sram)
-                                 ) ;
-  assign unused = ^req_q & ^write_q & ^wdata_q & ^wmask_q;
-/*`elsif GF22
-  gf22_efuse_wrap #(
-    .Depth                (Depth),
-    .Width                (TotalWidth),
-    .MemInitFile          (MemInitFile)
-  ) u_gf22_efuse_wrap (
-    .clk_i,
-    .rst_ni,
-    .VQPS_EFUSE ( 1'b1       ),
-    .VDD_EFUSE  ( 1'b1       ),
-    .VSS_EFUSE  ( 1'b0       ),
-    .req_i      ( req_q      ),
-    .write_i    ( write_q    ),
-    .addr_i     ( addr_q     ),
-    .wdata_i    ( wdata_q    ),
-    .rdata_o    ( rdata_sram ),
-    .rvalid_o   (            )
-  );*/
-`else // !`ifdef TARGET_SYNTHESIS
+// `ifdef TARGET_XILINX
+//   logic [7:0]                    wea;
+//   logic [63:0]                   dina;
+//   logic                          unused;
+//  
+//   assign wea  = 8'b00000000;
+//   assign dina = 64'h00000000_00000000;
+//   xilinx_rom_bank_1024x22 otp_mem_i (
+//                                  .clk (clk_i),
+//                                  .a   (addr_q),
+//                                  .spo (rdata_sram)
+//                                  ) ;
+//   assign unused = ^req_q & ^write_q & ^wdata_q & ^wmask_q;
+// /*`elsif GF22
+//   gf22_efuse_wrap #(
+//     .Depth                (Depth),
+//     .Width                (TotalWidth),
+//     .MemInitFile          (MemInitFile)
+//   ) u_gf22_efuse_wrap (
+//     .clk_i,
+//     .rst_ni,
+//     .VQPS_EFUSE ( 1'b1       ),
+//     .VDD_EFUSE  ( 1'b1       ),
+//     .VSS_EFUSE  ( 1'b0       ),
+//     .req_i      ( req_q      ),
+//     .write_i    ( write_q    ),
+//     .addr_i     ( addr_q     ),
+//     .wdata_i    ( wdata_q    ),
+//     .rdata_o    ( rdata_sram ),
+//     .rvalid_o   (            )
+//   );*/
+// `else // !`ifdef TARGET_SYNTHESIS
   otp_rom #(
     .Width(TotalWidth),
     .Depth(Depth),
@@ -125,7 +125,7 @@ module prim_otp_wrap_adv import prim_ram_1p_pkg::*; #(
   );
   logic  unused;
   assign unused = ^wdata_q & ^wmask_q & ^write_q;
-`endif 
+//`endif 
  
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin

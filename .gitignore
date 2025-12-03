@@ -6,7 +6,8 @@ tags
 __pycache__
 /.vscode
 opentitan-docs
-
+bender
+Bender.lock
 # fusesoc result
 build/
 

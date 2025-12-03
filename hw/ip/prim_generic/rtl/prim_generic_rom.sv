@@ -20,16 +20,16 @@ module prim_rom import prim_rom_pkg::*; #(
   input rom_cfg_t          cfg_i
 );
    
-`ifdef TARGET_XILINX
-  xilinx_rom_bank_8192x40 rom_mem_i (
-                                    .clk  (clk_i),
-                                    .a (addr_i),
-                                    .spo (rdata_o)
-                                    );
-     
-  logic  unused; 
-  assign unused = ^req_i & ^cfg_i & rst_ni;
-`else //  `ifdef TARGET_XILINX   
+// `ifdef TARGET_XILINX
+//   xilinx_rom_bank_8192x40 rom_mem_i (
+//                                     .clk  (clk_i),
+//                                     .a (addr_i),
+//                                     .spo (rdata_o)
+//                                     );
+//      
+//   logic  unused; 
+//   assign unused = ^req_i & ^cfg_i & rst_ni;
+// `else //  `ifdef TARGET_XILINX   
  secure_boot_rom #(
      .Depth(Depth),
      .Width(Width),
@@ -42,6 +42,6 @@ module prim_rom import prim_rom_pkg::*; #(
      .rdata_o
   );  
 
-`endif
+//`endif          
 
 endmodule

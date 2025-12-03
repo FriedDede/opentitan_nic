@@ -39,6 +39,7 @@ ifdef vip
 compile_script := scripts/compile_opentitan_vip.tcl
 else
 compile_script := scripts/compile_opentitan.tcl
+compile_dpi := scripts/compile_dpi.tcl
 endif
 
 VLOG_ARGS += -incr -64 -nologo -quiet -suppress vlog-2583 -suppress vlog-13314  +acc +nospecify +notimingchecks  -timescale \"1 ns / 1 ps\" 
@@ -53,8 +54,8 @@ endef
 .PHONY: init build sim update clean secure_boot_jtag secure_boot_spi
 
 build: scripts/compile_opentitan.tcl scripts/compile_opentitan_vip.tcl $(OT_ROOT)/hw/tb/vips
-	echo 'vlog "$ROOT/work-dpi/elfloader.cpp" -ccflags "-std=c++11"' > $(compile_script)
-	$(QUESTA) vsim -c -do 'source $(compile_script); quit'
+	
+	$(QUESTA) vsim -c -do 'source $(compile_script); source $(compile_dpi); quit'
 
 sim: build
 	$(QUESTA) vsim -c -do 'set SRAM $(SRAM); set BOOTMODE $(BOOTMODE); source $(run_script)'
@@ -63,7 +64,7 @@ update:
 	bender update
 
 clean:
-	rm -rf scripts/compile*
+	rm -rf scripts/compile_opentitan.tcl
 	rm -rf work
 	rm -rf *.log
 	rm -rf transcript

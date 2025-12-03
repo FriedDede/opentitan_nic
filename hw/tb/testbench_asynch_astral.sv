@@ -23,10 +23,10 @@ module testbench_asynch_astral ();
    import secure_subsystem_synth_pkg::*;
    import "DPI-C" function read_elf(input string filename);
    import "DPI-C" function byte get_section(output longint address, output longint len);
-   import "DPI-C" context function byte read_section(input longint address, inout byte buffer[]);
+   import "DPI-C" context function byte read_section(input longint address, inout byte buffer[], input longint len);
 
  ////////////////////////////  Defines ////////////////////////////
-   localparam TEST="/work/amotta/RoT_NIC/sim/opentitan/flash_preload_hmac_smoketest/flash_preload_hmac_smoketest.elf";
+   localparam TEST="/work/amotta/RoT_NIC/sim/opentitan/sram_hello_world/bazel-out/sram_hello_world.elf";
 
    localparam AxiWideBeWidth    = 4;
    localparam AxiWideByteOffset = $clog2(AxiWideBeWidth);
@@ -605,11 +605,11 @@ module testbench_asynch_astral ();
     while (get_section(section_addr, section_len)) begin
       // Read Sections
       automatic int num_words = (section_len + AxiWideBeWidth - 1)/AxiWideBeWidth;
-      $display("[JTAG SECD] Reading section %x with %0d words", section_addr, num_words);
+      $display("[JTAG SECD] Reading section %x with %0d words %0d length", section_addr, num_words, section_len);
 
       secd_sections[section_addr >> AxiWideByteOffset] = num_words;
       buffer = new[num_words * AxiWideBeWidth];
-      void'(read_section(section_addr, buffer));
+      void'(read_section(section_addr, buffer, section_len));
       for (int i = 0; i < num_words; i++) begin
         automatic logic [AxiWideBeWidth-1:0][7:0] word = '0;
         for (int j = 0; j < AxiWideBeWidth; j++) begin
@@ -632,6 +632,7 @@ module testbench_asynch_astral ();
     to_host_addr = 32'h c11c0018;
 
     // Initialize the dm module again, otherwise it will not work
+    $display("[JTAG SECD] Waiting for Completion");
     debug_secd_module_init();
     sbcs.sbreadonaddr = 1;
     sbcs.sbautoincrement = 0;

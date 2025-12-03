@@ -91,3 +91,4 @@ uart
 vsim.wlf
 work/
 hw/tb/vips
+model_tmp/*

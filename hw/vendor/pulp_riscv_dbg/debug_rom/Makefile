@@ -19,12 +19,11 @@ all: $(debug_rom) rename
 
 %.bin: %.elf
 	$(OBJCOPY) -O binary $< $@
-
+	$(OBJDUMP) -d $< --disassemble-all --disassemble-zeroes --section=.text --section=.text.startup --section=.text.init --section=.data  > $@.dump
+	
 %.elf: $(findstring debug_rom, $(debug_rom)).S link.ld
 	$(GCC) $(if  $(findstring one_scratch,$@),,-DSND_SCRATCH=1) $(FLAGS) -I$(RISCV)/include -Tlink.ld $< -nostdlib -fPIC -static -Wl,--no-gc-sections -o $@
 
-%.dump: %.elf
-	$(OBJDUMP) -d $< --disassemble-all --disassemble-zeroes --section=.text --section=.text.startup --section=.text.init --section=.data  > $@
 
 clean:
 	rm -f *.img *.dump *.bin *.sv

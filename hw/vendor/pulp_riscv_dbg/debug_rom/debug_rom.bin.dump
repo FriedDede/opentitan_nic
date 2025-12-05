@@ -1,0 +1,58 @@
+
+debug_rom.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000000800 <entry>:
+ 800:	00c0006f          	j	80c <_entry>
+
+0000000000000804 <resume>:
+ 804:	07c0006f          	j	880 <_resume>
+
+0000000000000808 <exception>:
+ 808:	04c0006f          	j	854 <_exception>
+
+000000000000080c <_entry>:
+ 80c:	0ff0000f          	fence
+ 810:	7b241073          	csrw	dscratch0,s0
+ 814:	7b351073          	csrw	dscratch1,a0
+ 818:	00000517          	auipc	a0,0x0
+ 81c:	00c55513          	srli	a0,a0,0xc
+ 820:	00c51513          	slli	a0,a0,0xc
+
+0000000000000824 <entry_loop>:
+ 824:	f1402473          	csrr	s0,mhartid
+ 828:	10852023          	sw	s0,256(a0) # 918 <_end+0x84>
+ 82c:	00a40433          	add	s0,s0,a0
+ 830:	40044403          	lbu	s0,1024(s0)
+ 834:	00147413          	andi	s0,s0,1
+ 838:	02041c63          	bnez	s0,870 <going>
+ 83c:	f1402473          	csrr	s0,mhartid
+ 840:	00a40433          	add	s0,s0,a0
+ 844:	40044403          	lbu	s0,1024(s0)
+ 848:	00247413          	andi	s0,s0,2
+ 84c:	fa041ce3          	bnez	s0,804 <resume>
+ 850:	fd5ff06f          	j	824 <entry_loop>
+
+0000000000000854 <_exception>:
+ 854:	00000517          	auipc	a0,0x0
+ 858:	00c55513          	srli	a0,a0,0xc
+ 85c:	00c51513          	slli	a0,a0,0xc
+ 860:	10052623          	sw	zero,268(a0) # 960 <_end+0xcc>
+ 864:	7b302573          	csrr	a0,dscratch1
+ 868:	7b202473          	csrr	s0,dscratch0
+ 86c:	00100073          	ebreak
+
+0000000000000870 <going>:
+ 870:	10052223          	sw	zero,260(a0)
+ 874:	7b302573          	csrr	a0,dscratch1
+ 878:	7b202473          	csrr	s0,dscratch0
+ 87c:	a85ff06f          	j	300 <whereto>
+
+0000000000000880 <_resume>:
+ 880:	f1402473          	csrr	s0,mhartid
+ 884:	10852423          	sw	s0,264(a0)
+ 888:	7b302573          	csrr	a0,dscratch1
+ 88c:	7b202473          	csrr	s0,dscratch0
+ 890:	7b200073          	dret

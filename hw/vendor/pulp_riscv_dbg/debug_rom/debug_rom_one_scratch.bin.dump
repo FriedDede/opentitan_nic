@@ -1,0 +1,46 @@
+
+debug_rom_one_scratch.elf:     file format elf64-littleriscv
+
+
+Disassembly of section .text:
+
+0000000000000800 <entry>:
+ 800:	00c0006f          	j	80c <_entry>
+
+0000000000000804 <resume>:
+ 804:	0500006f          	j	854 <_resume>
+
+0000000000000808 <exception>:
+ 808:	0340006f          	j	83c <_exception>
+
+000000000000080c <_entry>:
+ 80c:	0ff0000f          	fence
+ 810:	7b241073          	csrw	dscratch0,s0
+
+0000000000000814 <entry_loop>:
+ 814:	f1402473          	csrr	s0,mhartid
+ 818:	10802023          	sw	s0,256(zero) # 100 <whereto-0x200>
+ 81c:	40044403          	lbu	s0,1024(s0)
+ 820:	00147413          	andi	s0,s0,1
+ 824:	02041263          	bnez	s0,848 <going>
+ 828:	f1402473          	csrr	s0,mhartid
+ 82c:	40044403          	lbu	s0,1024(s0)
+ 830:	00247413          	andi	s0,s0,2
+ 834:	fc0418e3          	bnez	s0,804 <resume>
+ 838:	fddff06f          	j	814 <entry_loop>
+
+000000000000083c <_exception>:
+ 83c:	10002623          	sw	zero,268(zero) # 10c <whereto-0x1f4>
+ 840:	7b202473          	csrr	s0,dscratch0
+ 844:	00100073          	ebreak
+
+0000000000000848 <going>:
+ 848:	10002223          	sw	zero,260(zero) # 104 <whereto-0x1fc>
+ 84c:	7b202473          	csrr	s0,dscratch0
+ 850:	ab1ff06f          	j	300 <whereto>
+
+0000000000000854 <_resume>:
+ 854:	f1402473          	csrr	s0,mhartid
+ 858:	10802423          	sw	s0,264(zero) # 108 <whereto-0x1f8>
+ 85c:	7b202473          	csrr	s0,dscratch0
+ 860:	7b200073          	dret
